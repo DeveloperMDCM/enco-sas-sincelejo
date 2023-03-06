@@ -1,0 +1,53 @@
+
+
+  
+  .tituloinicio {
+    line-height: .95;
+    color: #21d72a;
+    font-weight: 900;
+    font-size: 150px;
+    text-transform: uppercase;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    text-align: center;
+    
+  }
+  
+  .pagina-principal {
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 100vh; 
+  }
+  
+ 
+  
+  .btninicio {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 270px;
+    height: 70px;
+    border-radius: 10px;
+    background: none;
+    font-size: 25px;
+    user-select: none;
+    background: #373939;
+    transition: 1s;
+    color: #fff;
+    letter-spacing: .45em;
+   font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+    margin: 120px 0;
+    cursor: pointer;
+  }
+  
+  .btninicio:hover {
+    background: #069cff;
+    color: #fff;
+  }
