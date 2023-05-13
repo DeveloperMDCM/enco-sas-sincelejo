@@ -225,7 +225,7 @@ const Administrativos = () => {
                     data-bs-toggle="modal"
                           onClick={handleImagenModal}
                           data-bs-target="#modaladmins"
-                          src={`http://localhost/proyectoenco/Backend/images/${administradores.foto}` }
+                          src={`http://201.232.254.252/proyectoenco/Backend/images/${administradores.foto}` }
                           alt="Foto admin"  />
                     <div className="pl-3">
                         <div className="text-base font-semibold">{administradores.nombres} {administradores.apellidos}</div>
