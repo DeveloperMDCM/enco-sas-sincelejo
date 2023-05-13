@@ -1,3 +1,9 @@
+/* table td {
+  pointer-events: none;
+} */
+
+
+
 .sk-chase {
   width: 40px;
   height: 40px;

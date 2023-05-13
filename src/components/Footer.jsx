@@ -1,8 +1,9 @@
 const Footer = () => {
+
     return (
-      <footer className="text-center mt-4">
-        <h3 className="fw-bold text-primary">ENCO SAS 
-       <span className="text-black"> - SOLUCIONES ENERGETICAS</span></h3>
+      <footer className="text-center ">
+        <p className="fw-bold text-primary">ENCO SAS 
+       <span className="text-black"> - SOLUCIONES ENERGETICAS - 2023 </span></p>
       </footer>
     )
   }

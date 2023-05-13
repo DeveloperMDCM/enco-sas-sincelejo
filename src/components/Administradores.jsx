@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import Header from "./Header";
-import "../Spinner.css";
 import withReactContent from "sweetalert2-react-content";
 import { show_alerta } from "../functions";
 import { useFetch } from "../useFetch";
-
-const Administradores = () => {
-  const url = `${import.meta.env.VITE_BACKEND_URL}`;
+import ListaResultados from "./ListaResultados";
+import CambioPaginas from "./CambioPaginas";
+import Spinner from "./Spinner";
+const Administrativos = () => {
+  const url = `${import.meta.env.VITE_BACKEND_URL}administrador.php`;
   const { response, error, loading, fetchData } = useFetch(url);
   const { administrador } = response;
   const [id, setId] = useState("");
@@ -22,6 +23,19 @@ const Administradores = () => {
   const [operation, setOperation] = useState(1);
   const [fotoModal, setFotoModal] = useState("");
   const [title, setTitle] = useState("");
+  const [limite, setLimite] = useState('');
+  const [buttonText, setButtonText] = useState('Guardar');
+  function handleClick() {
+    setButtonText('Espere...');
+  }
+  const handleResultados = (e) => {
+    if(e.target.value === ''){
+      fetchData();
+    }
+    fetchData(`limite=${e.target.value}`);
+    setLimite(`limite=${e.target.value}`)
+    
+}
   const openModal = (
     op,
     id,
@@ -43,9 +57,9 @@ const Administradores = () => {
     setRol("");
     setOperation(op);
     if (op === 1) {
-      setTitle("Registrar administrador");
+      setTitle("Registrar Administrativo");
     } else if (op === 2) {
-      setTitle("Editar administrador");
+      setTitle("Editar Administrativo");
       setId(id);
       setCedula(cedula);
       setNombre(nombres);
@@ -63,13 +77,14 @@ const Administradores = () => {
   const validar = () => {
     var parametros;
     var metodo;
+    handleClick();
     if (operation === 1) {
       parametros = {
         nombres: nombres.trim(),
         cedula: cedula.trim(),
         apellido: apellido.trim(),
         telefono: telefono.trim(),
-        foto: foto,
+        foto:  document.querySelector("#foto").value.split(/(\\|\/)/g).pop() || foto,
         correo: correo.trim(),
         rol: rol.trim(),
       };
@@ -80,9 +95,9 @@ const Administradores = () => {
         cedula: cedula.trim(),
         nombres: nombres.trim(),
         apellido: apellido.trim(),
-        correo: correo.trim(),
-        foto: foto,
         telefono: telefono.trim(),
+        foto: document.querySelector("#foto").value.split(/(\\|\/)/g).pop() || foto,
+        correo: correo.trim(),
         rol: rol.trim(),
       };
       metodo = "PUT";
@@ -96,17 +111,20 @@ const Administradores = () => {
         const msj = respuesta.data[1];
         // console.log(respuesta);
         if (msj === "b") {
-          show_alerta("Imagen no compatible o error en la solitud", "error");
+          show_alerta("No se a podido establecer conexion con el servidor", "error");
           return;
         }
-
+        setButtonText('Guardar');
         show_alerta(msj, tipo);
         if (tipo === "success") {
           document.getElementById("btnCerrar").click();
-          fetchData();
+          fetchData(limite);
         }
         if (tipo === "error") {
-          fetchData();
+          fetchData(limite);
+        }
+        if(error) {
+          show_alerta("No se a podido establecer conexion con el servidor", "error");
         }
       })
       .catch(function (error) {
@@ -142,78 +160,78 @@ const Administradores = () => {
   };
 
   const handleRecargarDatos = () => {
-    fetchData();
+    fetchData(limite);
   }
   return (
     <>
-      <div>
+   
         <Header />
-      </div>
-
-      <div className="container-fluid">
+       
+  
+        <div className="container-fluid">
         <div className="row mt-3">
-          <div className="col-md-4 offset-md-4">
+      <CambioPaginas />
+          <div className="col-12 offset-md-12 menu-opciones-header">
             <div className="d-grid mx-auto">
-              <button
-                onClick={() => openModal(1)}
-                className="btn btn-outline-success"
+             {/* Botones para limite de resultados  */}
+             <div className="btn bg-dark text-white   d-flex flex-column" >
+        <i className="fa-solid fa-magnifying-glass"></i> limite de resultados
+          <form onChange={handleResultados} >
+              <ListaResultados />
+          </form>
+
+      <div  role="group">
+  <button onClick={() => openModal(1)}
                 data-bs-toggle="modal"
-                data-bs-target="#modalProducts"
-              >
-                <i className="fa-solid fa-circle-plus w-100"></i> Añadir nuevo
-                administrador
-              </button>
-            
-        
-        <button className="btn btn-danger mt-1" onClick={handleRecargarDatos}>
-        <i className="fa-solid fa-spinner "></i> Recargar Datos
-        </button>
+                data-bs-target="#modalProducts" type="button" className="px-4  py-2 text-sm font-medium text-gray-900 bg-transparent border border-gray-900 rounded-l-lg hover:bg-gray-900 hover:text-white focus:z-10 focus:ring-2 focus:ring-gray-500 focus:bg-gray-900 focus:text-white dark:border-white dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:bg-gray-700">
+  <i className="fa-solid  fa-circle-plus flex flex-col text-green-600"></i> Nuevo
+  </button>
+  <button onClick={handleRecargarDatos}  type="button" className="px-4 py-2 text-sm font-medium text-gray-900 bg-transparent border border-gray-900 rounded-r-md hover:bg-gray-900 hover:text-white focus:z-10 focus:ring-2 focus:ring-gray-500 focus:bg-gray-900 focus:text-white dark:border-white dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:bg-gray-700">
+  <i className="fa-solid fa-spinner  text-red-600 "></i> Recargar
+  </button>
+
+</div>
+
+        </div>
         </div>
            
           </div>
         </div>
-        <div className="row mt-2">
-          <div className="col-12">
-            <div className="table-responsive table caption-top ">
-              <table className="table  table-striped  fw-semibold  table-hover  fw-bold  table-dark text-info text-opacity-75">
-              <caption className="text-center">Lista de administradores</caption>
-                <thead className="text-center table-dark text-danger">
-                  <tr>
-                    <th>#</th>
-                    <th>CEDULA</th>
-                    <th>NOMBRES</th>
-                    <th>APELLIDOS</th>
-                    <th>CORREO</th>
-                    <th>FOTO</th>
-                    <th>TELEFONO</th>
-                    <th>USUARIO</th>
-                    <th>ROL</th>
-                    <th>OPCIONES</th>
-                  </tr>
-                </thead>
-
-                <tbody className="table-group-divider text-success">
+        <div className="relative overflow-x-auto shadow-md sm:rounded-lg mt-2">
+         <div className="flex items-center justify-between  bg-white dark:bg-gray-900"> 
+            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead className="text-xs text-center text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+                    <th scope="col" className="px-6 py-3">id</th>
+                    <th scope="col" className="px-6 py-3">información</th>
+                    <th scope="col" className="px-6 py-3">CEDULA</th>
+                    <th scope="col" className="px-6 py-3">TELEFONO</th>
+                    <th scope="col" className="px-6 py-3">USUARIO</th>
+                    <th scope="col" className="px-6 py-3">ROL</th>
+                    <th scope="col" className="px-6 py-3">OPCIONES</th>
+            </tr>
+        </thead>
+        <tbody>
+       
+        </tbody>
+                <tbody className="table-group-divider  text-center">
                   {administrador?.map((administradores, i) => (
-                    <tr key={administradores.id} className="text-center ">
+                     <tr key={administradores.id} className=" border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                       {/* <td>{(administradores.id)}</td> */}
-                      <td>{i + 1}</td>
-                      <td>{administradores.cedula}</td>
-                      <td>{administradores.nombres}</td>
-                      <td>{administradores.apellidos}</td>
-                      <td>{administradores.correo}</td>
-                      <td>
-                        <img
-                          data-bs-toggle="modal"
+                      <td className="px-6 py-4">{i + 1}</td>
+                      <th scope="row" className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                     
+                    <img  className="w-10 h-10 rounded-full"
+                    data-bs-toggle="modal"
                           onClick={handleImagenModal}
                           data-bs-target="#modaladmins"
-                          className="border rounded"
-                          src={`data:image/jpg;png;jpeg;base64, ${administradores.foto}`}
-                          alt="Foto admin"
-                          width={70}
-                          height={70}
-                        />
-
-                        <div
+                          src={`http://localhost/proyectoenco/Backend/images/${administradores.foto}` }
+                          alt="Foto admin"  />
+                    <div className="pl-3">
+                        <div className="text-base font-semibold">{administradores.nombres} {administradores.apellidos}</div>
+                        <div className="font-normal text-gray-500">{administradores.correo}</div>
+                    </div>  
+                    <div
                           className="modal fade  text-center "
                           id="modaladmins"
                           aria-hidden="true"
@@ -246,10 +264,16 @@ const Administradores = () => {
                             </div>
                           </div>
                         </div>
-                      </td>
-                      <td>{administradores.telefono}</td>
-                      <td>{administradores.login.username}</td>
-                      <td>{administradores.rol ? "Administrador" : null}</td>
+                      </th>
+                      <td className="px-6 py-4">{administradores.cedula}</td>
+                      <td className="px-6 py-4">{administradores.telefono}</td>
+                      <td>{administradores.login.name}</td>
+                      <td className=" py-4">
+                 
+                        <div className="rounded-full bg-green-600 mr-2 "><span className="mx-2 text-white font-bold">{administradores.rol ? "Administrador" : null}</span></div>
+                  
+                </td>
+                      
                       <td>
                         <div
                           className="btn-group position-relative mt-3"
@@ -310,23 +334,14 @@ const Administradores = () => {
             </div>
           </div>
         </div>
-      </div>
       {loading && (
         <>
-          <div className="d-flex justify-content-center mb-5 mt-5">
-            <div className="sk-chase">
-              <div className="sk-chase-dot"></div>
-              <div className="sk-chase-dot"></div>
-              <div className="sk-chase-dot"></div>
-              <div className="sk-chase-dot"></div>
-              <div className="sk-chase-dot"></div>
-              <div className="sk-chase-dot"></div>
-            </div>
-          </div>
-          <h1 className="text-center">Espere un momento...</h1>
+      <Spinner />
         </>
       )}
-      <div id="modalProducts"  className="modal fade" aria-hidden="true">
+     <iframe name="dummyframe" id="dummyframe" hidden ></iframe>
+                <form method="POST" target="dummyframe" id="formulario-registro" action="http://localhost/proyectoenco/Backend/upload.php" encType="multipart/form-data">
+      <div id="modalProducts"  className="modal fade" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
         <div className="modal-dialog modal-dialog-centered"   >
           <div className="modal-content">
             <div className="modal-header">
@@ -404,25 +419,9 @@ const Administradores = () => {
                   name="foto"
                   accept="image/png, image/jpg, image/jpeg"
                   className="form-control formulario-administrador"
-                  placeholder="Foto administrador"
+                  placeholder="Foto Tecnico"
                   onChange={(e) => {
-                    const toBase64 = (file) =>
-                      new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.readAsDataURL(file);
-                        reader.onload = () =>
-                          resolve(
-                            reader.result.split("base64")[1].split(",")[1]
-                          );
-                        reader.onerror = (error) => reject(error);
-                      });
-
-                    async function Main() {
-                      const file = e.target.files[0];
-                      //    console.log(await toBase64(file));
-                      setFoto(await toBase64(file));
-                    }
-
+                   
                     function fileValidation() {
                       var fileInput = document.getElementById("foto");
 
@@ -435,7 +434,7 @@ const Administradores = () => {
                         fileInput.value = "";
                         return false;
                       }
-                      Main();
+                     
                     }
                     fileValidation();
                   }}
@@ -468,17 +467,23 @@ const Administradores = () => {
                 ></input>
               </div>
 
-              <div className="d-grid col-6 mx-auto w-100">
-                <button onClick={() => validar()} className="btn btn-success">
-                  <i className="fa-solid fa-floppy-disk"></i> Guardar
+                {buttonText == 'Espere...' && (
+                  <>
+                <Spinner />
+                  </>
+                )}
+              <div className="d-grid mx-auto w-100">
+                <button onClick={() => validar()} className="btn btn-success w-100">
+                  <i className="fa-solid fa-floppy-disk"></i> {buttonText}
                 </button>
               </div>
             </div>
           </div>
         </div>
       </div>
+        </form>
     </>
   );
 };
 
-export default Administradores;
+export default Administrativos;
